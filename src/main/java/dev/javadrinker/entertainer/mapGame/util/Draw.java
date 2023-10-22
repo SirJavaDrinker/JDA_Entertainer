@@ -1,7 +1,6 @@
 package dev.javadrinker.entertainer.mapGame.util;
 
-import dev.javadrinker.entertainer.Experiments;
-import dev.javadrinker.entertainer.mapGame.GameState;
+import dev.javadrinker.entertainer.mapGame.*;
 import dev.javadrinker.entertainer.mapGame.objects.GameObject;
 import dev.javadrinker.entertainer.mapGame.objects.PlayerObject;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,7 +16,6 @@ import static dev.javadrinker.entertainer.mapGame.objects.ObjectTypes.*;
 import static dev.javadrinker.entertainer.mapGame.objects.PlayerObject.getPlayers;
 
 public class Draw {
-    private static int test1 = 0;
     public static String draw(int cX, int cY) {
         String lineOut = "";
         for (int y = cY + 3; y > cY - 4; y--) {
@@ -27,8 +25,6 @@ public class Draw {
                 for (PlayerObject p : getPlayers()) {
                     if (new CoordinateSet(x, y).equals(p.location)) {
                         lineOut += p.getSprite();
-                        test1++;
-                        System.out.println(p.getSprite() + " "+ test1);
                         hasAdded = true;
                     }
                 }

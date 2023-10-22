@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -20,20 +21,19 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static dev.javadrinker.entertainer.mapGame.objects.PlayerObject.getPlayers;
 import static dev.javadrinker.entertainer.mapGame.objects.PlayerObject.spawn;
 import static dev.javadrinker.entertainer.mapGame.util.Draw.draw;
 
-public class GameState extends ListenerAdapter {
+public class GameState extends ListenerAdapter implements EventListener {
     private static Map<CoordinateSet, GameObject> occupyingObjects = new HashMap<CoordinateSet, GameObject>();
 
     private static Boolean hasBeenInitialized = false;
     public static ArrayList<String> usedDefaultSprites = new ArrayList<>();
     private static int frameNumber = 0;
+    private static long lastInteraction = System.currentTimeMillis();
 
     private static Map<Long,Message> displayWindowsID = new HashMap<>();
     private static Map<Long, InteractionHook> displayWindowsHook = new HashMap<>();
@@ -59,8 +59,9 @@ public class GameState extends ListenerAdapter {
         return hasBeenInitialized;
     }
 
-    public static void incrementFrameNumber() {
-        frameNumber+=1;
+    public static void incrementFrameNumber(String reason) {
+        frameNumber++;
+        System.out.println("Incrementing to: ["+frameNumber + "] because: [" + reason+"]");
     }
 
     public static int getFrame() {
@@ -72,6 +73,7 @@ public class GameState extends ListenerAdapter {
 
         if (shouldStartNewGame) {
             occupyingObjects.clear();
+            metronome();
 
             Map<CoordinateSet, GameObject> additiveMap = MapData.readLevelString(level);
             for (Map.Entry<CoordinateSet, GameObject> entry : additiveMap.entrySet()) {
@@ -99,10 +101,22 @@ public class GameState extends ListenerAdapter {
 
         new Window(hook, user.getIdLong()).paint(hook, user);
 
-        gameLoop(hook, user);
+        gameLoop(hook, user, "Game state init.");
     }
 
-
+    private static void metronome() {
+        System.out.println("Metronome init");
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (System.currentTimeMillis()-lastInteraction<1000*60*5) {
+                    incrementFrameNumber("Metronome ticked.");
+                    Window.varnish();
+                }
+            }
+        }, 0, 20000 );
+    }
 
     private static boolean ensurePlayerExistence(InteractionHook hook, User user) {
         if (!PlayerObject.exists(user)) {
@@ -137,23 +151,34 @@ public class GameState extends ListenerAdapter {
     }
     public static void movePlayer(User user, String str, InteractionHook hook) {
         GameObject player = PlayerObject.get(user);
+
+        boolean valid = true;
         if (str.equalsIgnoreCase("up")) {
             player.moveObject(0, 1, hook, user);
-            gameLoop(hook, user);
-        } else if (str.equalsIgnoreCase("right")) {
+            gameLoop(hook, user, "Player moved up.");
+        }
+        else if (str.equalsIgnoreCase("right")) {
             player.moveObject(1, 0, hook, user);
-            gameLoop(hook, user);
-        } else if (str.equalsIgnoreCase("down")) {
+            gameLoop(hook, user, "Player moved right.");
+        }
+        else if (str.equalsIgnoreCase("down")) {
             player.moveObject(0, -1, hook, user);
-            gameLoop(hook, user);
-        } else if (str.equalsIgnoreCase("left")) {
+            gameLoop(hook, user, "Player moved down.");
+        }
+        else if (str.equalsIgnoreCase("left")) {
             player.moveObject(-1, 0, hook, user);
-            gameLoop(hook, user);
+            gameLoop(hook, user, "Player moved left.");
+        }
+        else {
+            valid=false;
+        }
+        if (valid){
+            lastInteraction=System.currentTimeMillis();
         }
     }
 
 
-    public static void gameLoop(InteractionHook hook, User user) {
+    public static void gameLoop(InteractionHook hook, User user, String reason) {
         ensurePlayerExistence(hook, user);
 
         for (PlayerObject p: getPlayers()) {
@@ -162,7 +187,7 @@ public class GameState extends ListenerAdapter {
 
         //drawSetting(hook, user);
         Window.varnish();
-        incrementFrameNumber();
+        incrementFrameNumber("Game loop ran because: ["+reason+"]");
     }
 
     /*

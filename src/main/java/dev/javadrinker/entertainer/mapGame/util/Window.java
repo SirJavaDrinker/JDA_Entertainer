@@ -3,9 +3,13 @@ package dev.javadrinker.entertainer.mapGame.util;
 import dev.javadrinker.entertainer.Experiments;
 import dev.javadrinker.entertainer.mapGame.GameState;
 import dev.javadrinker.entertainer.mapGame.objects.PlayerObject;
+import dev.javadrinker.entertainer.util.Embeds;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.session.ShutdownEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +20,7 @@ import java.util.ArrayList;
 import static dev.javadrinker.entertainer.mapGame.objects.PlayerObject.getPlayers;
 import static dev.javadrinker.entertainer.mapGame.util.Draw.draw;
 
-public class Window {
+public class Window extends ListenerAdapter {
 
     private static ArrayList<Window> allWindows = new ArrayList();
 
@@ -92,6 +96,9 @@ public class Window {
 
     public static void varnish() {
         EmbedBuilder eb = new EmbedBuilder();
+        if (allWindows.isEmpty()) {
+            return;
+        }
         for (Window w : allWindows) {
             InteractionHook windowHook = w.hook;
 
@@ -145,4 +152,7 @@ public class Window {
             varnish();
         }
     }
+
+
+
 }

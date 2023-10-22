@@ -48,7 +48,6 @@ public class PlayerObject extends GameObject {
     }
 
     public void generateDefaultSprite() {
-        System.out.println("uh");
         Random random = new Random();
         String str = "smile";
         int randomInt = random.nextInt(16);

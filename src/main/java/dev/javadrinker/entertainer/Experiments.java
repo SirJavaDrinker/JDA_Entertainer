@@ -33,7 +33,6 @@ public class Experiments {
 
         builder = JDABuilder.createDefault(token);
         RegisterCommands.register(builder);
-
         jda = builder.setActivity(Activity.watching("You."))
                 .addEventListeners(
                         new JoinUpsertCommandsEvent(),
@@ -50,7 +49,10 @@ public class Experiments {
                 .build()
                 .awaitReady();
 
+
+
         upsertCommands();
+
 
     }
 
