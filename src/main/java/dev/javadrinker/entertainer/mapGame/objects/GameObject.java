@@ -18,6 +18,8 @@ public class GameObject {
 
     public ObjectTypes type;
     public CoordinateSet location;
+
+    // !! Add better ID system to use between classes.
     public Long ID;
     public String sprite;
 
