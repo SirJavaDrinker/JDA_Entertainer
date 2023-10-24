@@ -10,6 +10,9 @@ import java.util.Random;
 
 //
 public class PlayerObject extends GameObject {
+
+    // Would be more useful to remove sprites from this class and use the GameObject class for all sprite management.
+    
     private long lastMovement;
     private String sprite = ":neutral_face:";
     private String defaultSprite = ":neutral_face:";
