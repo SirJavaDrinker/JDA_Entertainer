@@ -81,19 +81,6 @@ public class GameState extends ListenerAdapter implements EventListener {
             }
         }
 
-        /*
-        if (displayWindowsID.containsKey(user.getIdLong())) {
-            displayWindowsHook.get(user.getIdLong()).deleteMessageById(displayWindowsID.get(user.getIdLong()).getIdLong()).queue();
-            displayWindowsID.remove(user.getIdLong());
-            displayWindowsHook.remove(user.getIdLong());
-        }
-
-        if (displayWindowsID.containsKey(user.getIdLong())) {
-            displayWindowsID.get(user.getIdLong()).delete().queue();
-            displayWindowsID.remove(user.getIdLong());
-        }
-         */
-
         if (Window.exists(user)) {
             Window.remove(user.getIdLong());
         }
@@ -104,6 +91,7 @@ public class GameState extends ListenerAdapter implements EventListener {
         gameLoop(hook, user, "Game state init.");
     }
 
+    
     private static void metronome() {
         System.out.println("Metronome init");
         Timer timer = new Timer();
@@ -118,6 +106,7 @@ public class GameState extends ListenerAdapter implements EventListener {
         }, 0, 20000 );
     }
 
+    // Function below needs to be removed/replaced.
     private static boolean ensurePlayerExistence(InteractionHook hook, User user) {
         if (!PlayerObject.exists(user)) {
             return false;
@@ -125,6 +114,7 @@ public class GameState extends ListenerAdapter implements EventListener {
         return true;
     }
 
+    // Look into seperating from GameState class into some kind of input handling class for function below.
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         InteractionHook hook = event.getHook();
@@ -149,6 +139,8 @@ public class GameState extends ListenerAdapter implements EventListener {
             movePlayer(user, str, hook);
         }
     }
+
+    // The below function needs to be removed and placed elsewhere 
     public static void movePlayer(User user, String str, InteractionHook hook) {
         GameObject player = PlayerObject.get(user);
 
@@ -177,83 +169,26 @@ public class GameState extends ListenerAdapter implements EventListener {
         }
     }
 
-
+    
     public static void gameLoop(InteractionHook hook, User user, String reason) {
         ensurePlayerExistence(hook, user);
 
         for (PlayerObject p: getPlayers()) {
             p.perFrameUpdates();
         }
-
-        //drawSetting(hook, user);
+        
         Window.varnish();
         incrementFrameNumber("Game loop ran because: ["+reason+"]");
     }
 
-    /*
-    private static void drawSetting(InteractionHook hook, User user) {
-
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(Color.gray);
-
-        Button leftButton = Button.primary("left_button", "←");
-        Button rightButton = Button.primary("right_button", "→");
-        Button upButton = Button.primary("up_button", "↑");
-        Button downButton = Button.primary("down_button", "↓");
-        Button customizeMapButton = Button.primary("customize_button", "⬤");
-
-        CoordinateSet location = players.get(user.getIdLong()).location;
-        eb.addField("I don't have a name for this...", draw(location.x(), location.y()), true);
-        eb.addField("", "Currently displaying for: " + user.getAsMention()
-                + "\n Version: " + Experiments.getConfig().get("VERSION")
-                + "\n Currently at coordinates: " + players.get(user.getIdLong()).location, true);
-        eb.setFooter("Heavily inspired by PolyMars. https://www.youtube.com/@PolyMars");
-
-        if (!displayWindowsID.containsKey(user.getIdLong())) {
-            hook.sendMessageEmbeds(eb
-                            .build())
-                    .addActionRow(leftButton, rightButton, upButton, downButton, customizeMapButton)
-                    .setEphemeral(false)
-                    .queue( message -> {
-                        if (displayWindowsID.containsKey(user.getIdLong())) {
-                            displayWindowsID.get(user.getIdLong()).delete().queue();
-                        }
-                        displayWindowsID.put(user.getIdLong(), message);
-                        displayWindowsHook.put(user.getIdLong(), hook);
-                    });
-        } else {
-            updateAllWindows(hook);
-        }
-    }
-
-    public static void updateAllWindows(InteractionHook hook) {
-        EmbedBuilder eb = new EmbedBuilder();
-        for (Map.Entry<Long,Message> entry: displayWindowsID.entrySet()) {
-            InteractionHook windowHook = displayWindowsHook.get(entry.getKey());
-
-            if (players.get(entry.getKey()) != null) {
-                eb.clearFields();
-
-                CoordinateSet location = players.get(entry.getKey()).location;
-
-                eb.addField("I don't have a name for this...", draw(location.x(), location.y()), true);
-                eb.addField("", "Currently displaying for: " + entry.getKey()
-                        + "\n Version: " + Experiments.getConfig().get("VERSION")
-                        + "\n Currently at coordinates: " + players.get(entry.getKey()).location, true);
-                eb.setFooter("Heavily inspired by PolyMars. https://www.youtube.com/@PolyMars");
-
-
-                windowHook.editMessageEmbedsById(displayWindowsID.get(entry.getKey()).getId(), eb.build()).queue();
-            }
-        }
-    }
-
-     */
-
+    
+    // To be removed.
     public static Map getOccupyingObjects() {
         return occupyingObjects;
     }
 
+
+    // Needs to be fixed and added over to the Window class.
     @Override
     public void onMessageDelete(MessageDeleteEvent event) {
         for (Map.Entry<Long,Message> entry: displayWindowsID.entrySet()){
